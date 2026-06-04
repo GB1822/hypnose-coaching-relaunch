@@ -10,7 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: {node-version: 20}
+        with:
+          node-version: 22
       - run: npm ci
       - run: npx next build --webpack
       - uses: docker/login-action@v3
@@ -19,7 +20,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v5
-        with: {context: ".", push: true, tags: "ghcr.io/${{ github.repository }}:latest"}
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/gb1822/hypnose-coaching-relaunch:latest
 
   deploy:
     needs: build-and-push
@@ -31,6 +35,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            docker pull ghcr.io/${{ github.repository }}:latest
+            docker pull ghcr.io/gb1822/hypnose-coaching-relaunch:latest
             cd /docker/hermes-webui-pda4
             docker compose up -d hypnose-site
